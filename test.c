@@ -22,39 +22,50 @@ void Lottery(int arr[][2]);
 
 int main(int argc, char *argv[]){
 
-     // 배열 인자전달로 값이 손상됨
-
     int choice = 0;
+    int arr[6][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     
-    while (1) {
-        int arr[6][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
-
         printf("1. FCFS\n");
         printf("2. SJF\n");
         printf("3. RR\n");
         printf("4. MLFQ\n");
         printf("5. Lottery\n");
+        printf("6. Exit\n");
         printf (">>>");
         scanf("%1d",&choice);
 
-    
-        switch(choice) {
-            case 1:
-                FCFS(arr);
-            case 2:
-                SJF(arr);
-            case 3:
-                RR(arr);
-            case 4:
-                MLFQ(arr);
-            case 5:
-                Lottery(arr);
-            case 6:
-                break;
+        while(1) {
+            if (choice < 7) break;
+            else {
+                    printf("Wrong Input!!!!!!!!\n\n\n");
+                    printf("1. FCFS\n");
+                    printf("2. SJF\n");
+                    printf("3. RR\n");
+                    printf("4. MLFQ\n");
+                    printf("5. Lottery\n");
+                    printf("6. Exit\n");
+                    printf (">>>");
+                    scanf("%1d",&choice);
+            }
+                
         }
+
+    
+    switch(choice) {
+        case 1:
+            FCFS(arr);
+        case 2:
+            SJF(arr);
+        case 3:
+            RR(arr);
+        case 4:
+            MLFQ(arr);
+        case 5:
+            Lottery(arr);
+        case 6:
+            break;
     }
 }
-
 
 void FCFS(int arr[][2])
 {
@@ -184,7 +195,6 @@ void RR(int arr[][2])
         if (ready > 0) { // 레디 큐에 처리할 프로세스가 존재한다면
             arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
             output[ready][i] = 1; // 아웃풋 데이터에 입력
-            past = ready;
         }
     }
 
@@ -202,7 +212,62 @@ void RR(int arr[][2])
 
 void MLFQ(int arr[][2])
 {
+    int i,j,l,k;
+    int loop = 0;  // 전체 시간
+    int ready = 0; //다음에 스케쥴링할 데이터
+    char output[6][20]; //아웃풋 데이터 저장
+    int q[6] = {0}; // 배고픔을 저장
+    int pr[6] = {0}; // 처리된 회수를 저장
 
+    for (i = 1; i < 6; i++) {
+        loop += arr[i][1];
+        //printf("%d %d\n", arr[i][0], arr[i][1]);
+    }
+    //printf("%d",loop);
+
+    for (i = 0; i < loop; i++) {
+        
+        for (k = 1; k < 6; k++) {
+            if (i >= arr[k][0] && k != ready) {// 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
+                // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
+                q[k]++;
+            }
+            else if (i >= arr[k][0] && k == ready) // 스케쥴링이 직전에 되었다면
+                //q[k] = 0; // 배고픔은 사라짐
+                q[k] = 0;
+        }
+        
+        ready = 0; // 실행할 프로세스를 고르기 전에 초기화
+
+        for (j = 1; j < 6; j++) {
+            if (i == arr[j][0] && arr[j][1] >= 1) { ready = j; break;} // 새로 들어온 프로세스는 무조건 우선순위를 가져서 먼저 처리됨
+            if (i >=arr[j][0] && arr[j][1] >= 1) { // 현재 진행 시간에 프로세스가 도착했는지 판단하고 스케쥴링 할 프로세스의 처리시간이 남았는지 확인
+                if (ready == 0) { // 실행할 프로세스를 아직 고르지 못했다면
+                    ready = j; // 프로세스를 고름
+                }
+                else if (pr[ready] > pr[j] && q[j] != 0) { // 실행될 프로세스가 새로 발견한 프로세스보다 더 낮은 우선순위의 큐에 있는지 확인하고 배고픔을 체크 (배고픔을 체크 안할경우 더 낮은 상태의 큐가 무조건 먼저 돌아감) 
+                    ready = j;
+                }
+            }
+        }
+
+        if (ready > 0) { // 레디 큐에 처리할 프로세스가 존재한다면
+            arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
+            output[ready][i] = 1; // 아웃풋 데이터에 입력
+            pr[ready]++; // 프로세스의 우선순위를 낮춤
+        }
+    }
+
+    for (i = 1; i < 6; i++) {
+        for (l = 0; l < loop; l++)  {
+            if (output[i][l] == 1) {
+                printf(" ■ ");
+            }
+            else
+                printf(" □ ");
+        }
+        printf("\n");
+    }
 }
 void Lottery(int arr[][2])
 {
