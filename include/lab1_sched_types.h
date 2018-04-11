@@ -29,15 +29,13 @@
 #include <pthread.h>
 #include <asm/unistd.h>
 
+#define M 6 //데이터개수
 
-/*
- * You need to Declare functions in  here
- */
-void FCFS(int arr[][2]);
-void SJF(int arr[][2]);
-void RR(int arr[][2]);
-void MLFQ(int arr[][2]);
-void Lottery(int arr[][2]);
+void FCFS();
+void SJF();
+void RR();
+void MLFQ();
+void Lottery();
 
 
 #endif /* LAB1_HEADER_H*/

@@ -12,43 +12,67 @@
 
 
 
-#include "../lab1_sched/include/lab1_sched_types.h"
+#include "/home/heejin/Scheduling-Algorithm/include/lab1_sched_types.h"
 
 /*
  * you need to implement scheduler simlator test code.
  *
  */
 
-void FCFS(int arr[][2]);
-void SJF(int arr[][2]);
-void RR(int arr[][2]);
-void MLFQ(int arr[][2]);
-void Lottery(int arr[][2]);
+void FCFS();
+void SJF();
+void RR();
+void MLFQ();
+void Lottery();
 
 int main(int argc, char *argv[]){
 
-    int arr[5][2] = {{0,3},{2,6},{4,4},{6,5},{8,2}};
-
     int choice = 0;
-    printf("1. FCFS");
-    printf("2. SJF");
-    printf("3. RR");
-    printf("4. MLFQ");
-    printf("5. Lottery");
+    
+    while (1) {
+        printf("------------------- NOTICE ------------------\n");
+        printf("이 프로그램은 예제 데이터 셋을 사용합니다.\n");
+        printf("1. FCFS\n");
+        printf("2. SJF\n");
+        printf("3. RR\n");
+        printf("4. MLFQ\n");
+        printf("5. Lottery\n");
+        printf("6. Exit\n");
+        printf (">>>");
+        scanf("%1d",&choice);
 
-    scanf("%1d",&choice);
-
-    switch(choice) {
-        case 1:
-            FCFS(arr);
-        case 2:
-            SJF(arr);
-        case 3:
-            RR(arr);
-        case 4:
-            MLFQ(arr);
-        case 5:
-            Lottery(arr);
+        while(1) {
+            if (choice < 7) break;
+            else {
+                    printf("Wrong Input!!!!!!!!\n\n\n");
+                    printf("1. FCFS\n");
+                    printf("2. SJF\n");
+                    printf("3. RR\n");
+                    printf("4. MLFQ\n");
+                    printf("5. Lottery\n");
+                    printf("6. Exit\n");
+                    printf (">>>");
+                    scanf("%1d",&choice);
+            }
+        }
+        switch(choice) {
+            case 1:
+                FCFS();
+                break;
+            case 2:
+                SJF();
+                break;
+            case 3:
+                RR();
+                break;
+            case 4:
+                MLFQ();
+                break;
+            case 5:
+                Lottery();
+                break;
+            case 6:
+                return 0;
+        }
     }
-   
 }
