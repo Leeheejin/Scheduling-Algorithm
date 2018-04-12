@@ -12,6 +12,19 @@
 
 #include "/home/heejinlee/Scheduling-Algorithm/include/lab1_sched_types.h"
 
+int int_pow(int base, int exp)
+{
+    int result = 1;
+    while (exp)
+    {
+        if (exp & 1)
+           result *= base;
+        exp /= 2;
+        base *= base;
+    }
+    return result;
+}
+
 void FCFS()
 {
     int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
