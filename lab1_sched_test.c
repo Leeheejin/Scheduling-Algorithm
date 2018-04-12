@@ -12,7 +12,7 @@
 
 
 
-#include "/home/heejinlee/Scheduling-Algorithm/include/lab1_sched_types.h"
+#include "/home/heejin/Scheduling-Algorithm/include/lab1_sched_types.h"
 
 void FCFS();
 void SJF();
@@ -28,6 +28,8 @@ int main(int argc, char *argv[]){
     while (1) {
         printf("------------------- NOTICE ------------------\n");
         printf("이 프로그램은 예제 데이터 셋을 사용합니다.\n");
+        printf("추가 데이터 셋은 소스파일 안에 들어있습니다.\n");
+        //printf("이 프로그램은 추가적인 데이터 셋을 사용합니다.\n");
         printf("1. FCFS\n");
         printf("2. SJF\n");
         printf("3. RR\n");
