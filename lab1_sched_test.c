@@ -1,8 +1,8 @@
 /*
 *	DKU Operating System Lab
 *	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 
-*	    Student name : 
+*	    Student id : 32142863  
+*	    Student name : 이희진
 *
 *   lab1_sched.c :
 *       - Lab1 source file.
@@ -12,12 +12,7 @@
 
 
 
-#include "/home/heejin/Scheduling-Algorithm/include/lab1_sched_types.h"
-
-/*
- * you need to implement scheduler simlator test code.
- *
- */
+#include "/home/heejinlee/Scheduling-Algorithm/include/lab1_sched_types.h"
 
 void FCFS();
 void SJF();

@@ -1,8 +1,8 @@
 /*
 *	DKU Operating System Lab
 *	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 
-*	    Student name : 
+*	    Student id : 32143862
+*	    Student name : 이희진
 *
 *   lab1_sched_types.h :
 *       - lab1 header file.
