@@ -28,14 +28,17 @@
 #include <assert.h>
 #include <pthread.h>
 #include <asm/unistd.h>
+#include <math.h>
 
 #define M 6 //데이터개수
+typedef enum {false, true} bool;
 
 void FCFS();
 void SJF();
 void RR();
 void MLFQ();
 void Lottery();
+int int_pow(int base, int exp);
 
 
 #endif /* LAB1_HEADER_H*/

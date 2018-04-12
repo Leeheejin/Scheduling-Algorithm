@@ -48,7 +48,7 @@ void FCFS()
         }
     }
 
-    printf("    ");
+    printf("   ");
     for (l = 0; l < loop; l++)  {
             printf("%2d   ",l);
         }
@@ -106,7 +106,7 @@ void SJF()
     }
 
 
-    printf("    ");
+    printf("   ");
     for (l = 0; l < loop; l++)  {
             printf("%2d   ",l);
         }
@@ -134,22 +134,26 @@ void RR()
 {
     int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     int i,j,l,k;
-    int loop = 0; 
-    int ready = 0;
-    int output[M][100] = {0};
-    int q[M] = {0};
+    int loop = 0; // 전체 시간
+    int ready = 0; //다음에 스케쥴링할 데이터
+    int output[M][100] = {0}; //아웃풋 데이터 저장
+    int q[M] = {0}; // 배고픔 측정용
+    int scpr[M] = {0}; // 프로세스가 타임퀀텀을 다 사용했는지 체크
+    int timequantom = 1; // 타임퀀텀
 
     for (i = 1; i < M; i++) {
         loop += arr[i][1];
     }
 
     for (i = 0; i < loop; i++) {
-        
-        for (k = 1; k < M; k++) {
-            if (i >= arr[k][0] && k != ready) // 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
-                q[k]++; // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
-            else if (i >= arr[k][0] && k == ready) // 스케쥴링이 직전에 되었다면
-                q[k] = 0; // 배고픔은 사라짐
+
+        if (scpr[ready] % timequantom == 0 || arr[ready][1] < 1) {
+            scpr[ready] = 0;
+            q[ready] = 0; // 스케쥴링이 되어 배고픔이 사라짐
+            for (k = 1; k < M; k++) {
+                if (i >= arr[k][0] && k != ready) // 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
+                    q[k]++; // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
+            }
         }
 
         ready = 0; // 실행할 프로세스를 고르기 전에 초기화
@@ -168,10 +172,11 @@ void RR()
         if (ready > 0) { // 레디 큐에 처리할 프로세스가 존재한다면
             arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
             output[ready][i] = 1; // 아웃풋 데이터에 입력
+            scpr[ready]++;
         }
     }
-
-    printf("    ");
+    printf("RR 의 현재 Time quantom은 1 입니다. 소스에서 수정이 가능합니다.\n");
+    printf("   ");
     for (l = 0; l < loop; l++)  {
             printf("%2d   ",l);
         }
@@ -197,78 +202,103 @@ void RR()
 
 void MLFQ()
 {
-    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
-    int arr[6][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
-    int i,j,l,k;
-    int loop = 0;  // 전체 시간
-    int ready = 0; //다음에 스케쥴링할 데이터
-    int q[M] = {0}; // 배고픔을 저장
-    int pr[M] = {0}; // 처리된 회수를 저장
-    int output[M][100] = {0}; //아웃풋 데이터 저장
+	//int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+	int arr[6][2] = { { 0,0 },{ 0,3 },{ 2,6 },{ 4,4 },{ 6,5 },{ 8,2 } };
+	int i, j, l, k;
+	int loop = 0;  // 전체 시간
+	int ready = 0; //다음에 스케쥴링할 데이터
+	int q[M] = { 0 }; // 배고픔을 저장
+	int pr[M] = { 0 }; // 처리된 회수를 저장
+	int output[M][100] = { 0 }; //아웃풋 데이터 저장
+	int timequantom = 1; // 타임퀀텀
+	int scpr[M] = { 0 }; // 프로세스가 타임퀀텀을 다 사용했는지 체크
+	int chktime = 0; // 현재 프로세스가 타임퀀텀이내에서 실행되고있는지
+	int emptyq = 0; // 현재 큐에 단 하나의 프로세스만 존재하는지
 
-    for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        //printf("%d %d\n", arr[i][0], arr[i][1]);
-    }
+	for (i = 1; i < M; i++) {
+		loop += arr[i][1];
+	}
 
-        
-    //printf("%d",loop);
+	for (i = 0; i < loop; i++) {
 
-    for (i = 0; i < loop; i++) {
-        
-        for (k = 1; k < M; k++) {
-            if (i >= arr[k][0] && k != ready) {// 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
-                // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
-                q[k]++;
-            }
-            else if (i >= arr[k][0] && k == ready) // 스케쥴링이 직전에 되었다면
-                // 배고픔은 사라짐
-                q[k] = 0;
-        }
-        
-        ready = 0; // 실행할 프로세스를 고르기 전에 초기화
+		if (chktime == 0) { // cpu에 프로세스가 올라가 있는지 확인합니다.
+			for (k = 1; k < M; k++) {
+				if (i >= arr[k][0] && k != ready) {// 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
+					q[k]++; // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
+					scpr[k] = 0; // 스케쥴링이 이뤄지지 않아서 타임퀀텀 초기화
+				}
+			}
+		}
 
-        for (j = 1; j < M; j++) {
-            if (i == arr[j][0] && arr[j][1] >= 1) { q[j] = 9999; if (ready == 0) ready = j;} // 새로 들어온 프로세스는 무조건 우선순위를 가져서 먼저 처리됨
-            if (i >= arr[j][0] && arr[j][1] >= 1) { // 현재 진행 시간에 프로세스가 도착했는지 판단하고 스케쥴링 할 프로세스의 처리시간이 남았는지 확인
-                if (ready == 0) { // 실행할 프로세스를 아직 고르지 못했다면
-                    ready = j; // 프로세스를 고름
-                }
-                else if (pr[ready] > pr[j] && q[j] != 0) { // 실행될 프로세스가 새 로 발견한 프로세스보다 더 낮은 우선순위의 큐에 있는지 확인하고 배고픔을 체크 (배고픔을 체크 안할경우 더 낮은 상태의 큐가 무조건 먼저 돌아감) 
-                    ready = j;
-                }
-            }
-        }
+		if (chktime == 0) // cpu에 선점되었는지 확인
+			ready = 0; // 실행할 프로세스를 고르기 전에 초기화
+		emptyq = 0; // 현재 스케쥴링의 대상인 프로세스 수
 
-        if (ready > 0) { // 레디 큐에 처리할 프로세스가 존재한다면
-            arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
-            output[ready][i] = 1; // 아웃풋 데이터에 입력
-            pr[ready]++; // 프로세스의 우선순위를 낮춤
-        }
-    }
+		for (j = 1; j < M; j++) {
+			if (i+1 >= arr[j][0] && arr[j][1] > 0) { emptyq++; } // 현재 스케쥴링의 대상이 될 수 있는 프로세스 조사
+            
+			if (i == arr[j][0] && arr[j][1] >= 1) { // 새롭게 들어온 프로세스라면
+				q[j] = 9999; // 가장 높은 우선순위 할당
+				if (ready == 0) { // 현재 스케쥴링할 대상을 정하지 않은 상태라면
+					ready = j; // 후보에 넣음
+				}
+			} // 새로 들어온 프로세스는 가장 우선순위 큐에 들어감 
 
-    printf("    ");
-    for (l = 0; l < loop; l++)  {
-            printf("%2d   ",l);
-        }
-        printf("\n    ");
-        
-        for (l = 0; l < loop; l++)  {
-            printf("-----");
-        }
-        printf("\n");
+			if (i >= arr[j][0] && arr[j][1] >= 1) { // 현재 진행 시간에 프로세스가 도착했는지 판단하고 스케쥴링 할 프로세스의 처리시간이 남았는지 확인
+				if (ready == 0 && chktime == 0) { // 실행할 프로세스를 아직 고르지 못했고 선점된 프로세스가 없다면
+					ready = j; // 프로세스를 고름
+				}
+				else if (pr[ready] > pr[j] && q[j] != 0) { // 실행될 프로세스가 새로 발견한 프로세스보다 더 낮은 우선순위의 큐에 있는지 확인하고 배고픔을 체크 (배고픔을 체크 안할경우 더 낮은 상태의 큐가 무조건 먼저 돌아감) 
+					if (chktime == 0) { // 선점되지 않았다면
+						ready = j;
+					} // 현재 ready에 들어간 프로세스가 타임퀀텀만큼 충분히 돌았는가 판단
+				}
+			}
+		}
 
-    for (i = 1; i < M; i++) {
-        printf("%c ",i+64);
-        for (l = 0; l < loop; l++)  {
-            if (output[i][l] == 1) {
-                printf("  ■  ");
-            }
-            else
-                printf("  □  ");
-        }
-        printf("\n");
-    }
+		if (ready > 0) { // 스케쥴링 후보에 오른 프로세스를 스케쥴링함
+			arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
+			output[ready][i] = 1; // 아웃풋 데이터에 입력
+			scpr[ready]++; // 프로세스가 타임퀀텀 사용
+			chktime = 1; // 현재 프로세스가 cpu를 사용 중임
+			q[ready] = 0; // 스케쥴링이 되어 배고픔이 사라짐
+						 //printf("empty? = %d\n",emptyq);
+			//printf("%d time %d runs until %d, %c \n", i,scpr[ready] , (int)int_pow(timequantom, pr[ready]), ready + 64);
+			if (scpr[ready] == (int)int_pow(timequantom, pr[ready]) || arr[ready][1] < 1) { // 프로세스가 타임퀀텀만큼 다 돌았으면 우선순위 낮은 큐로 들어감
+				scpr[ready] = 0; // 주어진 시간만큼 스케쥴링을 다 했기 때문에 초기화
+				chktime = 0; // 프로세스가 cpu에서 내려감
+				//printf("%d time %c time over\n", i, ready + 64);
+
+				if (emptyq > 1) // 단 하나의 프로세서만 스케쥴링의 대상이 아니라면
+					pr[ready]++; // 프로세스의 우선순위를 낮춤
+			}
+			//printf("pow is %d\n", (int)int_pow(timequantom,pr[ready]));
+		}
+	}
+
+    printf("MLFQ 의 현재 Time quantom은 1 입니다. 소스에서 수정이 가능합니다.\n");
+	printf("   ");
+	for (l = 0; l < loop; l++) {
+		printf("%2d   ", l);
+	}
+	printf("\n    ");
+
+	for (l = 0; l < loop; l++) {
+		printf("-----");
+	}
+	printf("\n");
+
+	for (i = 1; i < M; i++) {
+		printf("%c ", i + 64);
+		for (l = 0; l < loop; l++) {
+			if (output[i][l] == 1) {
+				printf("  ■  ");
+			}
+			else
+				printf("  □  ");
+		}
+		printf("\n");
+	}
 }
 
 void Lottery()
@@ -343,7 +373,7 @@ void Lottery()
 
     printf("\n");
 
-    printf("    ");
+    printf("   ");
     for (l = 0; l < loop; l++)  {
             printf("%2d   ",l);
         }

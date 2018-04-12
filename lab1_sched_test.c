@@ -24,6 +24,7 @@ void SJF();
 void RR();
 void MLFQ();
 void Lottery();
+int int_pow(int base, int exp);
 
 int main(int argc, char *argv[]){
 
