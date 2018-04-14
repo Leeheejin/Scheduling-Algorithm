@@ -1,1 +1,0 @@
-        if (chktime == 0) {
