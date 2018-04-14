@@ -15,7 +15,7 @@
 #include <asm/unistd.h>
 #include <math.h>
 
-#define M 8 //데이터개수
+#define M 6 //데이터개수
 typedef enum {false, true} bool;
 
 void FCFS();
@@ -31,8 +31,8 @@ int main(int argc, char *argv[]){
     
     while (1) {
         printf("------------------- NOTICE ------------------\n");
-        //printf("이 프로그램은 예제 데이터 셋을 사용합니다.\n");
-        printf("이 프로그램은 추가적인 데이터 셋을 사용합니다.\n");
+        printf("이 프로그램은 예제 데이터 셋을 사용합니다.\n");
+        //printf("이 프로그램은 추가적인 데이터 셋을 사용합니다.\n");
         printf("1. FCFS\n");
         printf("2. SJF\n");
         printf("3. RR\n");
@@ -93,29 +93,22 @@ int int_pow(int base, int exp)
 
 void FCFS()
 {
-    //int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
+    int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     //int arr[M][2] = {{0,0},{0,2},{1,5},{3,1},{7,4},{8,5}};
     //int arr[M][2] = {{0,0},{0,3},{0,6},{0,4},{0,5},{0,2}};
-    int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
     int i,j,k,l;
-    int loop = 0;
-    int ready = 0;
-    int output[M][100] = {0};
-    int maxsvt = -9999;
-    int maxsvp = 0;
+    int loop = 0; // 전체 서비스 가능한 타임
+    int ready = 0; //현재 cpu에 프로세스가 올라와있는지 체크
+    int output[M][100] = {0}; // 아웃풋 데이터
+    int lastdone = 0; // 맨 마지막 프로세스가 종료된 시점
+    int allprdone = 0; // 모든 프로세스의 스케쥴링이 종료되었는가
 
     for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        if (maxsvt < arr[i][0]) {
-            maxsvt = arr[i][0];
-            maxsvp = i;
-        }
+        loop += arr[i][1] + arr[i][0];
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
-
-    if (loop < maxsvt)
-        loop = maxsvt + arr[maxsvp ][1];
-
     //printf("%d",loop);
 
     // 총 걸리는 시간 계산
@@ -134,22 +127,26 @@ void FCFS()
             arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
             output[ready][i] = 1; // 아웃풋 데이터에 입력
         }
+        if (arr[M-1][1] < 1) { // 모든 프로세스의 스케쥴링이 종료되었는지 판정
+            lastdone = ++i; // 마지막 프로세스가 종료된 시점에서 총 스케쥴링 시간과 lastdone의 시간이 1 차이가 나기 때문에 ++i을 해 줘야 한다. 
+            break; // 모든 프로세스 스케쥴링이 끝났기 때문에 종료
+        }
     }
 
     printf("   ");
-    for (l = 0; l < loop; l++)  {
+    for (l = 0; l < lastdone; l++)  {
             printf("%2d   ",l);
         }
         printf("\n    ");
         
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             printf("-----");
         }
         printf("\n");
 
     for (i = 1; i < M; i++) {
         printf("%c ",i+64);
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             if (output[i][l] == 1) {
                 printf("  ■  ");
             }
@@ -162,34 +159,30 @@ void FCFS()
 
 void SJF()
 {
-    //int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
+    int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     //int arr[M][2] = {{0,0},{0,2},{1,5},{3,1},{7,4},{8,5}};
     //int arr[M][2] = {{0,0},{0,3},{0,6},{0,4},{0,5},{0,2}};
-    int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
     int i,j,k,l;
-    int loop = 0; 
-    int ready = 0;
-    int output[M][100] = {0};
-    int maxsvt = -9999;
-    int maxsvp = 0;
+    int loop = 0; // 전체 서비스 가능한 타임
+    int ready = 0; //현재 cpu에 프로세스가 올라와있는지 체크
+    int output[M][100] = {0}; // 아웃풋 데이터
+    int lastdone = 0; // 맨 마지막 프로세스가 종료된 시점
+    int allprdone = 0; // 모든 프로세스의 스케쥴링이 종료되었는가
 
     for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        if (maxsvt < arr[i][0]) {
-            maxsvt = arr[i][0];
-            maxsvp = i;
-        }
+        loop += arr[i][1]+arr[i][0];
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
 
-    if (loop < maxsvt)
-        loop = maxsvt + arr[maxsvp ][1];
-
-    
-
     for (i = 0; i < loop; i++) {
+
+        allprdone = 0; // 초기화를 해 주어야 매 루프마다 모든 프로세스의 스케쥴링이 끝났는지 체크 가능
         ready = 0;
+
         for (j = 1; j < M; j++) {
+
             if (i >=arr[j][0] && arr[j][1] >= 1) { // 현재 진행 시간에 프로세스가 도착했는지 판단하고 스케쥴링 할 프로세스의 처리시간이 남았는지 확인
                 if (ready == 0) { // 레디에 데이터가 들어갈 수 있는지 판단
                     ready = j; // 레디에 데이터 삽입
@@ -198,29 +191,37 @@ void SJF()
                     ready = j;
                 }
             }
+
+            if (arr[j][1] < 1) // 모든 프로세스 스케쥴링이 끝났는지 체크
+                allprdone++;
         }
 
         if (ready > 0) { // 레디에 처리할 프로세스가 존재한다면
             arr[ready][1]--; // 프로세스의 실행시간을 1 줄이고
             output[ready][i] = 1; // 아웃풋 데이터에 입력
         }
+
+        if (allprdone == M-1) { // 스케쥴링이 종료되었다면
+            lastdone = i; // lastdone이 현재시간을 기억하고 루프 종료
+            break;
+        }
     }
 
 
     printf("   ");
-    for (l = 0; l < loop; l++)  {
+    for (l = 0; l < lastdone; l++)  {
             printf("%2d   ",l);
         }
         printf("\n    ");
         
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             printf("-----");
         }
         printf("\n");
 
     for (i = 1; i < M; i++) {
         printf("%c ",i+64);
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             if (output[i][l] == 1) {
                 printf("  ■  ");
             }
@@ -233,43 +234,38 @@ void SJF()
 
 void RR()
 {
-    //int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
+    int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     //int arr[M][2] = {{0,0},{0,2},{1,5},{3,1},{7,4},{8,5}};
     //int arr[M][2] = {{0,0},{0,3},{0,6},{0,4},{0,5},{0,2}};
-    int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
     int i,j,l,k;
-    int loop = 0; // 전체 시간
-    int ready = 0; //다음에 스케쥴링할 데이터
-    int output[M][100] = {0}; //아웃풋 데이터 저장
     int q[M] = {0}; // 배고픔 측정용
     int scpr[M] = {0}; // 프로세스가 타임퀀텀을 다 사용했는지 체크
-    int timequantom = 4; // 타임퀀텀
-    int maxsvt = -9999;
-    int maxsvp = 0;
+    int timequantom = 1; // 타임퀀텀
+    int loop = 0; // 전체 서비스 가능한 타임
+    int ready = 0; //현재 cpu에 프로세스가 올라와있는지 체크
+    int output[M][100] = {0}; // 아웃풋 데이터
+    int lastdone = 0; // 맨 마지막 프로세스가 종료된 시점
+    int allprdone = 0; // 모든 프로세스의 스케쥴링이 종료되었는가
 
     for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        if (maxsvt < arr[i][0]) {
-            maxsvt = arr[i][0];
-            maxsvp = i;
-        }
+        loop += arr[i][1] + arr[i][0];
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
 
-    if (loop < maxsvt)
-        loop = maxsvt + arr[maxsvp ][1];
-
     for (i = 0; i < loop; i++) {
 
-        if (scpr[ready] % timequantom == 0 || arr[ready][1] < 1) {
-            scpr[ready] = 0;
+        if (scpr[ready] % timequantom == 0 || arr[ready][1] < 1) { // 프로세스가 타임퀀텀 만큼 실행되었거나 서비스시간만큼 실행되어서 더 이상 스케쥴링의 대상이 아니게 되었을 때
+            scpr[ready] = 0; // 타임퀀텀을 초기화해줌
             q[ready] = 0; // 스케쥴링이 되어 배고픔이 사라짐
             for (k = 1; k < M; k++) {
                 if (i >= arr[k][0] && k != ready) // 현재 진행 시간에 프로세스가 도착했는지 판단하고 k 값이 직전에 스케쥴링되었는지 확인
                     q[k]++; // 스케쥴링이 직전에 되지 않았다면 배고픔을 증가시킴
             }
         }
-
+        
+        allprdone = 0; // 초기화를 해 주어야 매 루프마다 모든 프로세스의 스케쥴링이 끝났는지 체크 가능
         ready = 0; // 실행할 프로세스를 고르기 전에 초기화
 
         for (j = 1; j < M; j++) {
@@ -281,6 +277,9 @@ void RR()
                     ready = j; // 더 배고프다면 스케쥴링할 프로세스를 교체
                 }
             }
+
+            if (arr[j][1] < 1) // 모든 프로세스 스케쥴링이 끝났는지 체크
+                allprdone++;
         }
 
         if (ready > 0) { // 레디 큐에 처리할 프로세스가 존재한다면
@@ -288,22 +287,28 @@ void RR()
             output[ready][i] = 1; // 아웃풋 데이터에 입력
             scpr[ready]++;
         }
+
+        if (allprdone == M-1) { // 스케쥴링이 종료되었다면
+            lastdone = i; // lastdone이 현재시간을 기억하고 루프 종료
+            break;
+        }
     }
-    printf("RR 의 현재 Time quantom은 4 입니다. 소스에서 수정이 가능합니다.\n");
+
+    printf("RR 의 현재 Time quantom은 1 입니다. 소스에서 수정이 가능합니다.\n");
     printf("   ");
-    for (l = 0; l < loop; l++)  {
+    for (l = 0; l < lastdone; l++)  {
             printf("%2d   ",l);
         }
         printf("\n    ");
         
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             printf("-----");
         }
         printf("\n");
 
     for (i = 1; i < M; i++) {
         printf("%c ",i+64);
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             if (output[i][l] == 1) {
                 printf("  ■  ");
             }
@@ -316,10 +321,12 @@ void RR()
 
 void MLFQ()
 {
-	//int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
+	int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     //int arr[M][2] = {{0,0},{0,2},{1,5},{3,1},{7,4},{8,5}};
     //int arr[M][2] = {{0,0},{0,3},{0,6},{0,4},{0,5},{0,2}};
-    int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
 	int i, j, l, k;
 	int loop = 0;  // 전체 시간
 	int ready = 0; //다음에 스케쥴링할 데이터
@@ -330,21 +337,14 @@ void MLFQ()
 	int scpr[M] = { 0 }; // 프로세스가 타임퀀텀을 다 사용했는지 체크
 	int chktime = 0; // 현재 프로세스가 타임퀀텀이내에서 실행되고있는지
 	int emptyq = 0; // 현재 큐에 단 하나의 프로세스만 존재하는지
-
-    	int maxsvt = -9999;
-    	int maxsvp = 0;
+    int lastdone = 0; // 맨 마지막 프로세스가 종료된 시점
+    int allprdone = 0; // 모든 프로세스의 스케쥴링이 종료되었는가
 
     for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        if (maxsvt < arr[i][0]) {
-            maxsvt = arr[i][0];
-            maxsvp = i;
-        }
+        loop += arr[i][1] + arr[i][0];
+
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
-
-    if (loop < maxsvt)
-        loop = maxsvt + arr[maxsvp ][1];
 
 	for (i = 0; i < loop; i++) {
 
@@ -360,6 +360,7 @@ void MLFQ()
 		if (chktime == 0) // cpu에 선점되었는지 확인
 			ready = 0; // 실행할 프로세스를 고르기 전에 초기화
 		emptyq = 0; // 현재 스케쥴링의 대상인 프로세스 수
+        allprdone = 0; // 초기화를 해 주어야 매 루프마다 모든 프로세스의 스케쥴링이 끝났는지 체크 가능
 
 		for (j = 1; j < M; j++) {
 			if (i+1 >= arr[j][0] && arr[j][1] > 0) { emptyq++; } // 현재 스케쥴링의 대상이 될 수 있는 프로세스 조사
@@ -381,6 +382,9 @@ void MLFQ()
 					} // 현재 ready에 들어간 프로세스가 타임퀀텀만큼 충분히 돌았는가 판단
 				}
 			}
+
+            if (arr[j][1] < 1)  // 모든 프로세스 스케쥴링이 끝났는지 체크
+                allprdone++; 
 		}
 
 		if (ready > 0) { // 스케쥴링 후보에 오른 프로세스를 스케쥴링함
@@ -401,23 +405,28 @@ void MLFQ()
 			}
 			//printf("pow is %d\n", (int)int_pow(timequantom,pr[ready]));
 		}
+
+        if (allprdone == M-1) { // 스케쥴링이 종료되었다면
+            lastdone = i; // lastdone이 현재시간을 기억하고 루프 종료
+            break;
+        }
 	}
 
-    printf("MLFQ 의 현재 Time quantom은 2^i 입니다. 소스에서 수정이 가능합니다.\n");
+    printf("MLFQ 의 현재 Time quantom은 1 입니다. 소스에서 수정이 가능합니다.\n");
 	printf("   ");
-	for (l = 0; l < loop; l++) {
+	for (l = 0; l < lastdone; l++) {
 		printf("%2d   ", l);
 	}
 	printf("\n    ");
 
-	for (l = 0; l < loop; l++) {
+	for (l = 0; l < lastdone; l++) {
 		printf("-----");
 	}
 	printf("\n");
 
 	for (i = 1; i < M; i++) {
 		printf("%c ", i + 64);
-		for (l = 0; l < loop; l++) {
+		for (l = 0; l < lastdone; l++) {
 			if (output[i][l] == 1) {
 				printf("  ■  ");
 			}
@@ -430,21 +439,23 @@ void MLFQ()
 
 void Lottery()
 {
-    //int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
+    //int arr[M][2] = {{0,0},{0,2},{6,4},{7,4},{8,2},{10,1}};
+    int arr[M][2] = {{0,0},{0,3},{2,6},{4,4},{6,5},{8,2}};
     //int arr[M][2] = {{0,0},{0,2},{1,5},{3,1},{7,4},{8,5}};
     //int arr[M][2] = {{0,0},{0,3},{0,6},{0,4},{0,5},{0,2}};
-    int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{2,6},{4,4},{6,5},{8,2},{8,6},{9,1}}; // M을 8로 만들고 실행할 것
+    //int arr[8][2] = {{0,0},{0,7},{0,6},{0,4},{0,5},{0,2},{0,6},{0,1}}; // M을 8로 만들고 실행할 것
     int i,j,k,l;
     int loop = 0; 
     int ready = 0;
-    //int take_tic[M] = {0,10,40,30,20,50}; // 각 프로세스가 가진 스케쥴링 우선도 티켓 case 1 : 프로세스가 가진 티켓이 사용자가 가진 티켓 미만인 경우
-    int take_tic[M] = {0,500,600,200,100,400,300,200}; // 각 프로세스가 가진 스케쥴링 우선도 티켓 case 2 : 프로세스가 가진 티켓이 사용자가 가진 티켓 미만인 경우
-    int sumtake = 0;
-    int scpr[M] = {0};
-    int gacha = -1;
+    int take_tic[M] = {0,10,40,30,20,50}; // 각 프로세스가 가진 스케쥴링 우선도 티켓 case 1 : 프로세스가 가진 티켓이 사용자가 가진 티켓 미만인 경우
+    //int take_tic[M] = {0,500,600,200,100,400,300,200}; // 각 프로세스가 가진 스케쥴링 우선도 티켓 case 2 : 프로세스가 가진 티켓이 사용자가 가진 티켓 미만인 경우
+    int sumtake = 0; //전체 티켓의 합
+    int scpr[M] = {0}; // 티켓의 구간
+    int gacha = -1; //뽑자!
     int output[M][100] = {0};
-    int maxsvt = -9999;
-    int maxsvp = 0;
+    int lastdone = 0; // 맨 마지막 프로세스가 종료된 시점
+    int allprdone = 0; // 모든 프로세스의 스케쥴링이 종료되었는가
 
     srand((unsigned int)time(NULL));
 
@@ -465,19 +476,20 @@ void Lottery()
     //printf(" %d",scpr[5]);
 
     for (i = 1; i < M; i++) {
-        loop += arr[i][1];
-        if (maxsvt < arr[i][0]) {
-            maxsvt = arr[i][0];
-            maxsvp = i;
-        }
+        loop += arr[i][1] + arr[i][0];
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
 
-    if (loop < maxsvt)
-        loop = maxsvt + arr[maxsvp ][1];
 
     for (i = 0; i < loop; i++) {
+
+        allprdone = 0;
+
         for (j = 1; j < M; j++) {
+
+            if (arr[j][1] < 1) // 모든 프로세스 스케쥴링이 끝났는지 체크
+                allprdone++;
+
             if (gacha == -1) {
                 gacha = rand() % scpr[M-1]; // 랜덤 티켓을 생성함
                 //printf("%d = 새로뽑았어!\n",gacha);
@@ -511,24 +523,29 @@ void Lottery()
             //printf("그래서 %d 는 정상처리\n",gacha);
             gacha = -1;
         }
+
+        if (allprdone == M-1) { // 스케쥴링이 종료되었다면
+            lastdone = ++i; // 마지막 프로세스가 종료된 시점에서 총 스케쥴링 시간과 lastdone의 시간이 1 차이가 나기 때문에 ++i을 해 줘야 한다. 
+            break;
+        }
     }
 
     printf("\n");
 
     printf("   ");
-    for (l = 0; l < loop; l++)  {
+    for (l = 0; l < lastdone; l++)  {
             printf("%2d   ",l);
         }
         printf("\n    ");
         
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             printf("-----");
         }
         printf("\n");
 
     for (i = 1; i < M; i++) {
         printf("%c ",i+64);
-        for (l = 0; l < loop; l++)  {
+        for (l = 0; l < lastdone; l++)  {
             if (output[i][l] == 1) {
                 printf("  ■  ");
             }
