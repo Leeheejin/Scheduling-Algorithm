@@ -101,11 +101,20 @@ void FCFS()
     int loop = 0;
     int ready = 0;
     int output[M][100] = {0};
+    int maxsvt = -9999;
+    int maxsvp = 0;
 
     for (i = 1; i < M; i++) {
         loop += arr[i][1];
+        if (maxsvt < arr[i][0]) {
+            maxsvt = arr[i][0];
+            maxsvp = i;
+        }
         //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
+
+    if (loop < maxsvt)
+        loop = maxsvt + arr[maxsvp ][1];
 
     //printf("%d",loop);
 
@@ -161,10 +170,20 @@ void SJF()
     int loop = 0; 
     int ready = 0;
     int output[M][100] = {0};
+    int maxsvt = -9999;
+    int maxsvp = 0;
 
     for (i = 1; i < M; i++) {
         loop += arr[i][1];
+        if (maxsvt < arr[i][0]) {
+            maxsvt = arr[i][0];
+            maxsvp = i;
+        }
+        //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
+
+    if (loop < maxsvt)
+        loop = maxsvt + arr[maxsvp ][1];
 
     
 
@@ -225,10 +244,20 @@ void RR()
     int q[M] = {0}; // 배고픔 측정용
     int scpr[M] = {0}; // 프로세스가 타임퀀텀을 다 사용했는지 체크
     int timequantom = 4; // 타임퀀텀
+    int maxsvt = -9999;
+    int maxsvp = 0;
 
     for (i = 1; i < M; i++) {
         loop += arr[i][1];
+        if (maxsvt < arr[i][0]) {
+            maxsvt = arr[i][0];
+            maxsvp = i;
+        }
+        //printf("%d %d\n", arr[i][0], arr[i][1]);
     }
+
+    if (loop < maxsvt)
+        loop = maxsvt + arr[maxsvp ][1];
 
     for (i = 0; i < loop; i++) {
 
@@ -303,9 +332,20 @@ void MLFQ()
 	int chktime = 0; // 현재 프로세스가 타임퀀텀이내에서 실행되고있는지
 	int emptyq = 0; // 현재 큐에 단 하나의 프로세스만 존재하는지
 
-	for (i = 1; i < M; i++) {
-		loop += arr[i][1];
-	}
+    	int maxsvt = -9999;
+    	int maxsvp = 0;
+
+    for (i = 1; i < M; i++) {
+        loop += arr[i][1];
+        if (maxsvt < arr[i][0]) {
+            maxsvt = arr[i][0];
+            maxsvp = i;
+        }
+        //printf("%d %d\n", arr[i][0], arr[i][1]);
+    }
+
+    if (loop < maxsvt)
+        loop = maxsvt + arr[maxsvp ][1];
 
 	for (i = 0; i < loop; i++) {
 
@@ -405,6 +445,8 @@ void Lottery()
     int scpr[M] = {0}; // 티켓의 구간
     int gacha = -1; //뽑자!
     int output[M][100] = {0};
+    int maxsvt = -9999;
+    int maxsvp = 0;
 
     srand((unsigned int)time(NULL));
 
@@ -426,7 +468,15 @@ void Lottery()
 
     for (i = 1; i < M; i++) {
         loop += arr[i][1];
-    }// 총 걸리는 시간 계산
+        if (maxsvt < arr[i][0]) {
+            maxsvt = arr[i][0];
+            maxsvp = i;
+        }
+        //printf("%d %d\n", arr[i][0], arr[i][1]);
+    }
+
+    if (loop < maxsvt)
+        loop = maxsvt + arr[maxsvp ][1];
 
     for (i = 0; i < loop; i++) {
         for (j = 1; j < M; j++) {
