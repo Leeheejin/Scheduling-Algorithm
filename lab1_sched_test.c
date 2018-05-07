@@ -1,16 +1,3 @@
-/*
-*	DKU Operating System Lab
-*	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 32142863  
-*	    Student name : 이희진
-*
-*   lab1_sched.c :
-*       - Lab1 source file.
-*       - Must contains scueduler algorithm test code.
-*
-*/
-
-
 
 #include "/home/heejin/Scheduling-Algorithm/include/lab1_sched_types.h"
 
